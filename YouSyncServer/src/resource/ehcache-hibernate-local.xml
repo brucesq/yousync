@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache updateCheck="false" name="hibernateCache">
+
+	<diskStore path="java.io.tmpdir/ehcache/showcase/hibernate" />
+
+	<!-- DefaultCache setting. -->
+	<defaultCache maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="600"
+		overflowToDisk="true"  />
+
+	<!-- Special objects setting. -->
+	<cache name="com.mpn.sd.User" maxElementsInMemory="1000" eternal="true"
+		overflowToDisk="true"  />
+	<cache name="com.mpn.sd.User.roleList" maxElementsInMemory="1000" eternal="true"
+		overflowToDisk="true"  />
+	<cache name="com.mpn.sd.entity.Team" maxElementsInMemory="100" eternal="true"
+		overflowToDisk="true"  />
+	<cache name="com.mpn.sd.Role" maxElementsInMemory="100"
+		eternal="true" overflowToDisk="true"  />
+</ehcache>
