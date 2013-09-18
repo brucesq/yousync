@@ -5,7 +5,6 @@
 	<classpathentry kind="src" path="src/apkutil"/>
 	<classpathentry kind="src" path="src/service"/>
 	<classpathentry kind="src" path="src/resource"/>
-	<classpathentry kind="src" path="src/framework"/>
 	<classpathentry kind="src" path="src/domain"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="TOMCAT_HOME/lib/servlet-api.jar"/>

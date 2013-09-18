@@ -45,7 +45,7 @@ public class CheckSoftwareUpdateThread implements Runnable {
 		String vOnline = "";
 		String vLocale = "";
 		String vCache = versionFile+".b";
-		IoUtils.saveFileFromUrl(Application.versionUrl, vCache, "");
+		IoUtils.saveFileFromUrl(Application.versionUrl+"?channels="+Application.channel, vCache, "");
 		File vFile = new File(vCache);
 		if(vFile.exists()){
 			try {
@@ -78,7 +78,7 @@ public class CheckSoftwareUpdateThread implements Runnable {
 	
 	private void updateDBFile(){
 		Application.setRightStatus("更新安装软件信息...", false);
-		IoUtils.saveFileFromUrl(Application.softWareUrl, dbFile+".b", "");
+		IoUtils.saveFileFromUrl(Application.softWareUrl+"?channels="+Application.channel, dbFile+".b", "");
 		File cacheFile = new File(dbFile+".b");
 		try {
 			String dbStr = FileUtils.readFileToString(cacheFile, "utf-8");

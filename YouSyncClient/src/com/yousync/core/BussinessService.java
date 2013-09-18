@@ -54,10 +54,12 @@ public class BussinessService {
 			if(code == 200l){
 				String name = (String)json.get("name");
 				Long userId = (Long)json.get("userId");
+				String channel = (String)json.get("channels");
 				currentUser = new User();
 				currentUser.id = userId;
 				currentUser.name = name;
 				System.out.println(userId+":"+name);
+				Application.updateChannel(channel);
 			}
 			
 			

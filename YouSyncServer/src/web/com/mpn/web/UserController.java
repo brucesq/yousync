@@ -50,6 +50,10 @@ public class UserController {
 		Map<String, Object> searchParams = Servlets.getParametersStartingWith(request, "search_");
 
 		List<User> users = accountService.searchUser(searchParams);
+		for(User user : users){
+			accountService.getUserChannel(user);
+		}
+		
 		model.addAttribute("users", users);
 		model.addAttribute("allStatus", allStatus);
 		return "account/userList";
@@ -58,9 +62,10 @@ public class UserController {
 	@RequiresRoles("Admin")
 	@RequestMapping(value = "update/{id}", method = RequestMethod.GET)
 	public String updateForm(@PathVariable("id") Long id, Model model) {
-		model.addAttribute("user", accountService.getUser(id));
+		model.addAttribute("user", accountService.getUserChannel(id));
 		model.addAttribute("allStatus", allStatus);
 		model.addAttribute("allRoles", accountService.getAllRole());
+		model.addAttribute("allChannels", accountService.getAllChannel());
 		return "account/userForm";
 	}
 	
@@ -70,6 +75,7 @@ public class UserController {
 		model.addAttribute("user", new User());
 		model.addAttribute("allStatus", allStatus);
 		model.addAttribute("allRoles", accountService.getAllRole());
+		model.addAttribute("allChannels", accountService.getAllChannel());
 		return "account/userForm";
 	}
 
@@ -79,15 +85,25 @@ public class UserController {
 	@RequiresPermissions("user:edit")
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	public String update(@Valid @ModelAttribute("user") User user,
-			@RequestParam(value = "roleList") List<Long> checkedRoleList, RedirectAttributes redirectAttributes) {
+			@RequestParam(value = "roleList") List<Long> checkedRoleList, 
+			@RequestParam(value = "channelList") List<Long> checkedChannelList,RedirectAttributes redirectAttributes) {
 
+		
 		// bind roleList
 		user.getRoleList().clear();
 		for (Long roleId : checkedRoleList) {
 			Role role = new Role(roleId);
 			user.getRoleList().add(role);
 		}
-
+		
+		String channelIds = "@";
+		for(Long cid : checkedChannelList){
+			channelIds += cid.toString() +"@";
+		}
+		user.setChannels(channelIds);
+		
+		
+		
 		accountService.saveUser(user);
 
 		redirectAttributes.addFlashAttribute("message", "保存用户成功");
@@ -123,6 +139,7 @@ public class UserController {
 	 */
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-		binder.setDisallowedFields("roleList");
+		binder.setDisallowedFields("roleList","channelList");
+
 	}
 }

@@ -163,6 +163,19 @@
 										
 									</div>
 									
+										
+									
+									<div class="control-group">
+
+										<label class="control-label">渠道<span class="required">*</span></label>
+
+										<div class="controls">
+											<form:bscheckboxes path="channelList" items="${allChannels}" itemLabel="name" itemValue="id" labelCssClass="checkbox line"/>
+											<div id="form_channel_error"></div>
+										</div>
+										
+									</div>
+									
 
 									<div class="form-actions">
 

@@ -3,7 +3,9 @@
  */
 package com.mpn.web.api;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -56,6 +58,7 @@ public class ApiController {
 			res.setMessage("successful");
 			res.setName(user.getName());
 			res.setUserId(user.getId());
+			res.setChannels(user.getChannels());
 		}
 		return res;
 	}
@@ -90,15 +93,24 @@ public class ApiController {
 	
 	@RequestMapping(value = "version")
 	public void version(HttpServletRequest request,HttpServletResponse response) throws Exception{
+		String channels = request.getParameter("channels");
 		String version = bussinessService.getVersion();
-		response.getWriter().write(version);
+		response.getWriter().write(version+channels);
 	}
 	
 	
 	
 	@RequestMapping(value = "softdb")
 	public void softDb(Model model,HttpServletRequest request,HttpServletResponse response) throws Exception{
+		String channels = request.getParameter("channels");
 		Iterable<SoftwareItem> softs = bussinessService.getAllSoftItem();
+		List<String> userChannelList = new ArrayList<String>();
+		if(channels != null){
+			userChannelList = getChannels(channels);
+		}
+		if(userChannelList.size() < 1){
+			userChannelList.add("1");
+		}
 		String PRIFIX_UTL = gloableService.getDownloadUrl();
 		String SPLIT = "###";
 		response.setContentType("text/plain; charset=utf-8");
@@ -106,6 +118,11 @@ public class ApiController {
 			if(!"enabled".equals(item.getStatus())){
 				continue;
 			}
+			List<String> channelList = getChannels(item.getChannels());
+			if(!isInList(userChannelList,channelList)){
+				continue;
+			}
+			
 			StringBuilder builder = new StringBuilder();
 			builder.append(bussinessService.encode(item.getName()));
 			builder.append(SPLIT);
@@ -130,5 +147,22 @@ public class ApiController {
 //		return "api/softdb";
 	}
 	
+	private List<String> getChannels(String channels){
+		String[] channelStrs = channels.split("@");
+		List<String> channelList = new ArrayList<String>();
+		for(String str:channelStrs){
+			if(str.length()>0){
+				channelList.add(str);
+			}
+		}
+		return channelList;
+	}
 	
+	private boolean isInList(List<String> allList,List<String> inList){
+		for(String str : inList){
+			if(allList.contains(str))
+				return true;
+		}
+		return false;
+	}
 }

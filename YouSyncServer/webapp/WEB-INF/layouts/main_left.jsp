@@ -44,6 +44,18 @@
 					</a>
 
 			</li>
+			
+			<li id="channel" >
+
+					<a href="${ctx}/channel/">
+
+					<i class="icon-th"></i> 
+
+					<span class="title">渠道管理</span>
+
+					</a>
+
+			</li>
 				
 
 			<li  id="stat" class="last ">

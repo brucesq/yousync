@@ -4,6 +4,8 @@
 package com.mpn.web;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletRequest;
@@ -19,6 +21,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,6 +34,7 @@ import org.springside.modules.web.Servlets;
 
 import com.google.common.collect.Maps;
 import com.mpn.sd.SoftwareItem;
+import com.mpn.service.AccountService;
 import com.mpn.service.BussinessService;
 import com.mpn.service.GloableService;
 import com.mpn.service.ShiroDbRealm.ShiroUser;
@@ -61,6 +66,10 @@ public class SoftController {
 
 	@Autowired
 	private GloableService gloableService;
+	
+	@Autowired
+	private AccountService accountService;
+
 
 	// 特别设定多个ReuireRoles之间为Or关系，而不是默认的And.
 	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
@@ -75,6 +84,10 @@ public class SoftController {
 				request, "search_");
 		Page<SoftwareItem> softs = bussinessService.getSoftItem(searchParams,
 				pageNumber, pageSize, sortType);
+		for(SoftwareItem item :softs){
+			bussinessService.getSoftwareItemChannel(item);
+			System.out.println(item.getChannelNames());
+		}
 
 		model.addAttribute("softs", softs);
 		model.addAttribute("sortType", sortType);
@@ -91,16 +104,24 @@ public class SoftController {
 	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
 	@RequestMapping(value = "update/{id}", method = RequestMethod.GET)
 	public String updateForm(@PathVariable("id") Long id, Model model) {
-		model.addAttribute("soft", bussinessService.getSoftwareItem(id));
+		
+		model.addAttribute("soft", bussinessService.getSoftwareItemChannel(bussinessService.getSoftwareItem(id)));
 		model.addAttribute("allStatus", SoftwareItem.getAllStatus());
-		// model.addAttribute("allRoles", accountService.getAllRole());
+		model.addAttribute("allChannels", accountService.getAllChannel());
+		
 		return "soft/softForm";
 	}
 
 	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	public String update(@Valid @ModelAttribute("soft") SoftwareItem item,
+			@RequestParam(value = "channelList") List<Long> checkedChannelList,
 			RedirectAttributes redirectAttributes) {
+		String channelIds = "@";
+		for(Long cid : checkedChannelList){
+			channelIds += cid.toString() +"@";
+		}
+		item.setChannels(channelIds);
 		bussinessService.saveSoftItem(item);
 		redirectAttributes.addFlashAttribute("message", "保存应用包成功");
 		return "redirect:/soft";
@@ -111,6 +132,7 @@ public class SoftController {
 	public String upload(
 			@RequestParam(value = "softType", defaultValue = "默认") String softType,
 			@RequestParam(value = "price", defaultValue = "1.0") String price,
+			@RequestParam(value = "channelList") List<Long> checkedChannelList,
 			@RequestParam MultipartFile apkFile, HttpServletRequest request) {
 		try {
 			Subject currentUser = SecurityUtils.getSubject();
@@ -134,6 +156,11 @@ public class SoftController {
 					.getLargeIcon(apkInfo.getApplicationIcons(),
 							apkInfo.getApplicationIcon()), realPath + "icon/"
 					+ apkInfo.getPackageName() + ".png");
+			String channelIds = "@";
+			for(Long cid : checkedChannelList){
+				channelIds += cid.toString() +"@";
+			}
+			item.setChannels(channelIds);
 			bussinessService.saveSoftItem(item);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -144,6 +171,8 @@ public class SoftController {
 	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
 	@RequestMapping(value = "create", method = RequestMethod.GET)
 	public String uploadForm(Model model) {
+		model.addAttribute("allChannels", accountService.getAllChannel());
+		model.addAttribute("soft", new SoftwareItem());
 		return "soft/softUpload";
 	}
 
@@ -153,5 +182,11 @@ public class SoftController {
 		if (id != -1) {
 			model.addAttribute("soft", bussinessService.getSoftwareItem(id));
 		}
+	}
+	
+	@InitBinder
+	protected void initBinder(WebDataBinder binder) {
+		binder.setDisallowedFields("channelList");
+
 	}
 }

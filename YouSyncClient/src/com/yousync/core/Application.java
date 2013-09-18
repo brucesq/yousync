@@ -4,6 +4,7 @@
 package com.yousync.core;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.net.NetworkInterface;
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.StringUtils;
 
 import com.yousync.model.SoftwareObject;
@@ -35,20 +37,17 @@ public class Application {
 	private static String applicationPath;
 	public final static String softWareUrl = "http://yousync.ignag.com/yousync/api/softdb";
 	public final static String versionUrl = "http://yousync.ignag.com/yousync/api/version";
-	// public final static String softWareUrl =
-	// "http://localhost:8080/yousync/api/softdb";
-	// public final static String versionUrl =
-	// "http://localhost:8080/yousync/api/version";
-	// public final static String softWareUrl =
-	// "http://img1.kyimg.com/imgp/ys.db";
-	// public final static String versionUrl =
-	// "http://img1.kyimg.com/imgp/version.txt";
+//	public final static String softWareUrl = "http://localhost:8080/yousync/api/softdb";
+//	public final static String versionUrl = "http://localhost:8080/yousync/api/version";
+//	public final static String softWareUrl = "http://img1.kyimg.com/imgp/ys.db";
+//	public final static String versionUrl = "http://img1.kyimg.com/imgp/version.txt";
 
 	private static List<SoftwareObject> models = new ArrayList<SoftwareObject>();
 	private static String cacheFileDir = "";
 	public static String deviceNum = "";
 	public static String deviceBrand = "";
 	public static String macAddr = "";
+	public static String channel = "";
 
 	public static void setModels(List<SoftwareObject> objs) {
 		models = objs;
@@ -67,6 +66,7 @@ public class Application {
 	private static void loadProperties() {
 		macAddr = getMac();
 		applicationPath = System.getProperty("user.dir");
+		initChannel();
 		LogUtils.init(applicationPath + File.separator + "configs"
 				+ File.separator + "logs");
 		AdbUtils.init(applicationPath + File.separator + "configs"
@@ -83,6 +83,30 @@ public class Application {
 		// String s = "000000" + Integer.toHexString(b);
 		// return s.substring(s.length() - 2);
 		return String.format("%02x", b); // 网友的建议,可修改为这个代码，更简单通用一些
+	}
+	public static void updateChannel(String pChannel){
+		channel = pChannel;
+		File channelFile = new File(applicationPath + File.separator + "c.txt");
+		try {
+			FileUtils.writeStringToFile(channelFile, pChannel,  "utf-8");
+			startSoftUpdateThread(applicationPath + File.separator + "configs"
+					+ File.separator + "ys.db", applicationPath + File.separator
+					+ "configs" + File.separator + "version.txt");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	public static void initChannel(){
+		File channelFile = new File(applicationPath + File.separator + "c.txt");
+		if(channelFile.exists()){
+			try {
+				channel = FileUtils.readFileToString(channelFile,  "utf-8");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		
 	}
 
 	public static String getMac() {

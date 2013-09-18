@@ -17,9 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springside.modules.persistence.DynamicSpecifications;
 import org.springside.modules.persistence.SearchFilter;
 
+import com.mpn.repository.ChannelDao;
 import com.mpn.repository.InstallRecordDao;
 import com.mpn.repository.SoftItemDao;
 import com.mpn.repository.VersionDao;
+import com.mpn.sd.Channel;
 import com.mpn.sd.InstallRecord;
 import com.mpn.sd.SoftwareItem;
 import com.mpn.sd.Version;
@@ -41,6 +43,9 @@ public class BussinessService {
 	@Autowired
 	private VersionDao versionDao;
 	
+	@Autowired
+	private ChannelDao channelDao;
+	
 	public void saveSoftItem(SoftwareItem item){
 		softItemDao.save(item);
 		updateVersion();
@@ -56,6 +61,21 @@ public class BussinessService {
 	
 	public SoftwareItem getSoftwareItem(Long id){
 		return softItemDao.findOne(id);
+	}
+	
+	public SoftwareItem getSoftwareItemChannel(SoftwareItem softwareItem){
+		String[] channels = softwareItem.getChannels().split("@");
+		for(String str : channels){
+			try{
+				Long cid = Long.parseLong(str);
+				Channel channel = channelDao.findOne(cid);
+				softwareItem.getChannelList().add(channel);
+				softwareItem.setChannelNames(softwareItem.getChannelNames()+", "+channel.getName());
+			}catch(Exception e){
+//				e.printStackTrace();
+			}
+		}
+		return softwareItem;
 	}
 	
 	public Iterable<SoftwareItem> getAllSoftItem(){

@@ -40,6 +40,13 @@ public class User extends IdEntity {
 	private String name;
 	private String email;
 	private String status;
+	private String channels;
+	
+	@Transient
+	private String channelNames = "";
+	
+	@Transient
+	private List<Channel> channelList = Lists.newArrayList(); 
 
 	private Team team;
 
@@ -141,5 +148,31 @@ public class User extends IdEntity {
 	@Override
 	public String toString() {
 		return ToStringBuilder.reflectionToString(this);
+	}
+
+	public String getChannels() {
+		return channels;
+	}
+
+	public void setChannels(String channels) {
+		this.channels = channels;
+	}
+	
+	@Transient
+	public String getChannelNames(){
+		return channelNames;
+	}
+
+	public void setChannelNames(String channelNames) {
+		this.channelNames = channelNames;
+	}
+
+	@Transient
+	public List<Channel> getChannelList() {
+		return channelList;
+	}
+
+	public void setChannelList(List<Channel> channelList) {
+		this.channelList = channelList;
 	}
 }

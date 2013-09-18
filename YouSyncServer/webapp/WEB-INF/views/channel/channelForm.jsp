@@ -5,7 +5,7 @@
 <c:set var="ctx" value="${pageContext.request.contextPath}" />
 <html>
 <head>
-<title>上传软件包</title>
+<title>渠道管理</title>
 <!-- BEGIN PAGE LEVEL STYLES -->
 
 <link rel="stylesheet" type="text/css"
@@ -34,11 +34,11 @@
 						<li><i class="icon-home"></i> YouSync <span
 							class="icon-angle-right"></span></li>
 
-						<li><a href="${ctx}/soft/">内容管理</a> <span class="icon-angle-right"></span>
+						<li><a href="${ctx}/channel/">渠道管理</a> <span class="icon-angle-right"></span>
 
 						</li>
 
-						<li>上传软件包</li>
+						<li>维护渠道</li>
 
 					</ul>
 
@@ -57,7 +57,7 @@
 
 							<div class="portlet-title">
 
-								<div class="caption"><i class="icon-reorder"></i>软件包上传</div>
+								<div class="caption"><i class="icon-reorder"></i>渠道维护</div>
 
 								<div class="tools">
 
@@ -73,8 +73,10 @@
 
 								
 								
-								<form:form id="form_sample_1" modelAttribute="soft"  action="${ctx}/soft/upload" method="post" enctype="multipart/form-data" class="form-horizontal">		
-
+								<form:form id="form_sample_1" modelAttribute="item" action="${ctx}/channel/update" method="post"  class="form-horizontal">		
+									
+									<input type="hidden" name="id" value="${item.id}"/>
+									
 									<div class="alert alert-error hide">
 
 										<button class="close" data-dismiss="alert"></button>
@@ -90,14 +92,14 @@
 										输入正确!
 
 									</div>
-
+									
 									<div class="control-group">
 
-										<label class="control-label">软件类型<span class="required">*</span></label>
+										<label class="control-label">名称<span class="required">*</span></label>
 
 										<div class="controls">
 
-											<input type="text" id="softType" name="softType" data-required="1" class="span6 m-wrap"/>
+											<input type="text" id="name" name="name" value="${item.name}" data-required="1" class="span6 m-wrap"/>
 
 										</div>
 
@@ -105,41 +107,15 @@
 
 									<div class="control-group">
 
-										<label class="control-label">价格<span class="required">*</span></label>
+										<label class="control-label">描述<span class="required">*</span></label>
 
 										<div class="controls">
 
-											<input id="price" name="price"  type="text" class="span6 m-wrap"/>
+											<input type="text" id="channelDesc" name="channelDesc" value="${item.channelDesc}" data-required="1" class="span6 m-wrap"/>
 
 										</div>
 
 									</div>
-									
-									
-									<div class="control-group">
-
-										<label class="control-label">渠道<span class="required">*</span></label>
-
-										<div class="controls">
-											<form:bscheckboxes path="channelList" items="${allChannels}" itemLabel="name" itemValue="id" labelCssClass="checkbox line"/>
-											<div id="form_channel_error"></div>
-										</div>
-										
-									</div>
-
-									
-									<div class="control-group">
-
-										<label class="control-label">APK文件<span class="required">*</span></label>
-
-										<div class="controls">
-
-											<input id="apkFile" name="apkFile"  type="file"  class="span6 m-wrap"/>
-
-										</div>
-
-									</div>
-									
 
 									
 
@@ -207,20 +183,24 @@
                 focusInvalid: false, // do not focus the last invalid input
                 ignore: "",
                 rules: {
-                	softType: {
+                	channelDesc: {
                         minlength: 2,
                         required: true
                     },
-                    price: {
-                        required: true,
-                        
-                    },
-                    apkFile: {
+                    
+                    name: {
                         required: true,
                         
                     }
                 },
 
+                errorPlacement: function (error, element) { // render error placement for each input type
+                    if (element.attr("name") == "status") { // for uniform checkboxes, insert the after the given container
+                        error.addClass("no-left-padding").insertAfter("#form_status_error");
+                    } else {
+                        error.insertAfter(element); // for other inputs, just perform default behavoir
+                    }
+                },
                 invalidHandler: function (event, validator) { //display error alert on form submit              
                     success1.hide();
                     error1.show();
@@ -250,8 +230,8 @@
 
 			
 		});
-		jQuery('#content').addClass('active');
-		jQuery('#content a').append('<span class="selected"></span>');
+		jQuery('#channel').addClass('active');
+		jQuery('#channel a').append('<span class="selected"></span>');
 	</script>
 
 	<!-- END JAVASCRIPTS -->

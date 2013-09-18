@@ -3,6 +3,7 @@
  */
 package com.mpn.sd;
 
+import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
@@ -10,6 +11,7 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
 /**
@@ -45,7 +47,15 @@ public class SoftwareItem extends IdEntity {
 	@Column(name = "soft_status")
 	private String status;
 	
+	@Column(name = "soft_channels")
+	private String channels;
+	
+	@Transient
+	private String channelNames = "";
 
+	@Transient
+	private List<Channel> channelList = Lists.newArrayList(); 
+	
 	public String getName() {
 		return name;
 	}
@@ -116,6 +126,31 @@ public class SoftwareItem extends IdEntity {
 	@Transient
 	public static Map<String, String> getAllStatus(){
 		return allStatus;
+	}
+	public String getChannels() {
+		return channels;
+	}
+
+	public void setChannels(String channels) {
+		this.channels = channels;
+	}
+	
+	@Transient
+	public String getChannelNames(){
+		return channelNames;
+	}
+
+	public void setChannelNames(String channelNames) {
+		this.channelNames = channelNames;
+	}
+
+	@Transient
+	public List<Channel> getChannelList() {
+		return channelList;
+	}
+
+	public void setChannelList(List<Channel> channelList) {
+		this.channelList = channelList;
 	}
 	
 	private static Map<String, String> allStatus = Maps.newHashMap();

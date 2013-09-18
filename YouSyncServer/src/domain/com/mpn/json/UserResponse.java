@@ -12,6 +12,9 @@ public class UserResponse {
 	private String name;
 	private Long userId;
 	private String message;
+	
+	private String channels;
+	
 	public String getName() {
 		return name;
 	}
@@ -35,6 +38,12 @@ public class UserResponse {
 	}
 	public void setUserId(Long userId) {
 		this.userId = userId;
+	}
+	public String getChannels() {
+		return channels;
+	}
+	public void setChannels(String channels) {
+		this.channels = channels;
 	}
 	
 	

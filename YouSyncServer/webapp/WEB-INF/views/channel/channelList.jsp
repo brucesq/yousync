@@ -5,7 +5,7 @@
 
 <html>
 <head>
-	<title>软件包管理</title>
+	<title>渠道管理</title>
 	<!-- BEGIN PAGE LEVEL STYLES -->
 
 	<link rel="stylesheet" type="text/css" href="${ctx}/media/css/select2_metro.css" />
@@ -52,7 +52,7 @@
 							</li>
 
 
-							<li><a href="#">软件包管理</a></li>
+							<li><a href="#">渠道管理</a></li>
 
 						</ul>
 
@@ -103,7 +103,7 @@
 					<div class="row-fluid">
 							<div>
 					
-							<a href="${ctx}/soft/create" id="sample_editable_1_new" class="btn green">添加 <i class="icon-plus"></i></a>
+							<a href="${ctx}/channel/add" id="sample_editable_1_new" class="btn green">添加 <i class="icon-plus"></i></a>
 							
 									
 								<form class="form-search" action="#">
@@ -126,7 +126,7 @@
 										<tr>
 
 											
-											<tr><th>名称</th><th>版本</th><th>类型</th><th>价格</th><th>状态</th><th>渠道</th><th>图标</th></tr>
+											<tr><th>名称</th><th>描述</th><th>创建日期</th></tr>
 
 										</tr>
 
@@ -135,15 +135,12 @@
 						<tbody>
 						
 						
-						<c:forEach items="${softs.content}" var="soft">
+						<c:forEach items="${items.content}" var="item">
 							<tr>
-								<td><a href="${ctx}/soft/update/${soft.id}">${soft.name}</a></td>
-								<td>${soft.version}</td>
-								<td>${soft.softType}</td>
-								<td>${soft.price}</td>
-								<td>${soft.statusName}</td>
-								<td>${soft.channelNames}&nbsp;</td>
-								<td><img src="${iconPrefix}${soft.iconUrl}" height="90" /></td>
+								<td><a href="${ctx}/channel/update/${item.id}">${item.name}</a></td>
+								<td>${item.channelDesc}</td>
+								<td>${item.createTime}</td>
+								
 							</tr>
 						</c:forEach>
 						
@@ -158,7 +155,7 @@
 										<div class="dataTables_info" id="sample_1_info"></div>
 									</div>
 									<div class="span6">
-										<tags:tablepage page="${softs}" paginationSize="5"/>
+										<tags:tablepage page="${items}" paginationSize="5"/>
 									</div>
 								</div>
 
@@ -226,8 +223,8 @@
 
 		});
 		
-		jQuery('#content').addClass('active');
-		jQuery('#content a').append('<span class="selected"></span>');
+		jQuery('#channel').addClass('active');
+		jQuery('#channel a').append('<span class="selected"></span>');
 	
 </script>
 	

@@ -132,6 +132,7 @@
 											<th>姓名</th>
 											<th>电邮</th>
 											<th>角色</th>
+											<th>渠道</th>
 											<th>状态</th>
 											<th>操作</th>
 
@@ -146,6 +147,7 @@
 						<td>${user.name}&nbsp;</td>
 						<td>${user.email}&nbsp;</td>
 						<td>${user.roleNames}&nbsp;</td>
+						<td>${user.channelNames}&nbsp;</td>
 						<td>${allStatus[user.status]}&nbsp;</td>
 						<td><shiro:hasPermission name="user:edit">
 								<a href="${ctx}/account/user/update/${user.id}"

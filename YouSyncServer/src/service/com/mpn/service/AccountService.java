@@ -9,6 +9,10 @@ import org.javasimon.aop.Monitored;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,9 +23,12 @@ import org.springside.modules.security.utils.Digests;
 import org.springside.modules.utils.Encodes;
 
 import com.google.common.collect.Maps;
+import com.mpn.repository.ChannelDao;
 import com.mpn.repository.RoleDao;
 import com.mpn.repository.UserDao;
+import com.mpn.sd.Channel;
 import com.mpn.sd.Role;
+import com.mpn.sd.SoftwareItem;
 import com.mpn.sd.User;
 import com.mpn.service.ShiroDbRealm.ShiroUser;
 import com.mpn.service.jms.NotifyMessageProducer;
@@ -51,6 +58,8 @@ public class AccountService {
 	private ApplicationStatistics applicationStatistics;
 
 	private BusinessLogger businessLogger;
+	
+	private ChannelDao channelDao;
 
 	/**
 	 * 在保存用户时,发送用户修改通知消息, 由消息接收者异步进行较为耗时的通知邮件发送.
@@ -92,6 +101,26 @@ public class AccountService {
 	 */
 	public User getUser(Long id) {
 		return userDao.findOne(id);
+		
+	}
+	
+	public User getUserChannel(Long id){
+		return getUserChannel(getUser(id));
+	}
+	
+	public User getUserChannel(User user){
+		String[] channels = user.getChannels().split("@");
+		for(String str : channels){
+			try{
+				Long cid = Long.parseLong(str);
+				Channel channel = getChannel(cid);
+				user.getChannelList().add(channel);
+				user.setChannelNames(user.getChannelNames()+", "+channel.getName());
+			}catch(Exception e){
+//				e.printStackTrace();
+			}
+		}
+		return user;
 	}
 	
 	public User getUser(String userName,String password){
@@ -157,6 +186,26 @@ public class AccountService {
 	 */
 	public Long getUserCount() {
 		return userDao.count();
+	}
+	
+	
+	public Page<Channel> getChannel( Map<String, Object> searchParams, int pageNumber, int pageSize,
+			String sortType) {
+		PageRequest pageRequest = buildPageRequest(pageNumber, pageSize, sortType);
+		Specification<Channel> spec = buildSpecification(searchParams);
+
+		return channelDao.findAll(spec, pageRequest);
+	}
+	
+	public Iterable<Channel> getAllChannel(){
+		return channelDao.findAll();
+	}
+	
+	public void saveChannel(Channel channel){
+		channelDao.save(channel);
+	}
+	public Channel getChannel(Long id){
+		return channelDao.findOne(id);
 	}
 
 	/**
@@ -243,5 +292,33 @@ public class AccountService {
 	@Autowired(required = false)
 	public void setApplicationStatistics(ApplicationStatistics applicationStatistics) {
 		this.applicationStatistics = applicationStatistics;
+	}
+
+	
+	@Autowired
+	public void setChannelDao(ChannelDao channelDao) {
+		this.channelDao = channelDao;
+	}
+	
+	
+	private PageRequest buildPageRequest(int pageNumber, int pagzSize, String sortType) {
+		Sort sort = null;
+		if ("auto".equals(sortType)) {
+			sort = new Sort(Direction.DESC, "id");
+		} else if ("title".equals(sortType)) {
+			sort = new Sort(Direction.ASC, "name");
+		}
+
+		return new PageRequest(pageNumber - 1, pagzSize, sort);
+	}
+
+	/**
+	 * 创建动态查询条件组合.
+	 */
+	private Specification<Channel> buildSpecification(Map<String, Object> searchParams) {
+		Map<String, SearchFilter> filters = SearchFilter.parse(searchParams);
+//		filters.put("user.id", new SearchFilter("user.id", Operator.EQ, userId));
+		Specification<Channel> spec = DynamicSpecifications.bySearchFilter(filters.values(), Channel.class);
+		return spec;
 	}
 }
