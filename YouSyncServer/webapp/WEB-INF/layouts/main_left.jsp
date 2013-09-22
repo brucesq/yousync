@@ -49,7 +49,7 @@
 
 					<a href="${ctx}/channel/">
 
-					<i class="icon-th"></i> 
+					<i class="icon-list-ul"></i> 
 
 					<span class="title">渠道管理</span>
 
