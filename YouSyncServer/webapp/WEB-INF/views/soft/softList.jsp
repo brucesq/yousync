@@ -88,8 +88,9 @@
 								<div class="caption"><i class="icon-globe"></i>记录列表</div>
 
 								<div class="tools">
-
-									
+									<a href="${ctx}/soft/create" >新增</a>
+									<a href="${ctx}/soft/offline?page=${page.totalPages}&sortType=${sortType}&${searchParams}" id="offline">下线</a>
+									<a href="${ctx}/soft/publish?page=${page.totalPages}&sortType=${sortType}&${searchParams}" id="publish">发布</a>
 								</div>
 
 							</div>
@@ -101,10 +102,7 @@
 								
 								
 					<div class="row-fluid">
-							<div>
-					
-							<a href="${ctx}/soft/create" id="sample_editable_1_new" class="btn green">添加 <i class="icon-plus"></i></a>
-							
+							<div>						
 									
 								<form class="form-search" action="#">
 						
@@ -119,14 +117,17 @@
 								
 								
 
-								<table class="table table-striped table-bordered table-hover" id="sample_1">
+								<table class="table table-striped table-bordered table-hover" id="table1">
 
 									<thead>
 
 										<tr>
 
 											
-											<tr><th>名称</th><th>版本</th><th>类型</th><th>价格</th><th>状态</th><th>渠道</th><th>图标</th></tr>
+											<tr>
+											<th style="width:8px;"><input type="checkbox" class="group-checkable" data-set="#table1 .checkboxes" /></th>
+											<th>名称</th><th>版本</th><th>类型</th><th>价格</th><th>状态</th><th>渠道</th><th>图标</th>
+											</tr>
 
 										</tr>
 
@@ -137,6 +138,7 @@
 						
 						<c:forEach items="${softs.content}" var="soft">
 							<tr>
+								<td><input type="checkbox" class="checkboxes" value="${soft.id}" /></td>
 								<td><a href="${ctx}/soft/update/${soft.id}">${soft.name}</a></td>
 								<td>${soft.version}</td>
 								<td>${soft.softType}</td>
@@ -167,6 +169,7 @@
 						</div>
 
 						<!-- END EXAMPLE TABLE PORTLET-->
+						
 
 					</div>
 
@@ -211,7 +214,7 @@
 		   App.init();
 
 		  // TableManaged.init();
-		   jQuery('#sample_1 .group-checkable').change(function () {
+		   jQuery('#table1 .group-checkable').change(function () {
                var set = jQuery(this).attr("data-set");
                var checked = jQuery(this).is(":checked");
                jQuery(set).each(function () {
@@ -223,12 +226,43 @@
                });
                jQuery.uniform.update(set);
            });
-
+		   
+		   
+		   jQuery('#publish').click(function (){
+			   var postUrl = $(this).attr("href");
+			   var set = jQuery('#table1 .checkboxes');
+				 jQuery(set).each(function () {
+					 var isChecked = $(this).attr("checked");
+					 if(isChecked == "checked"){
+						 var value = $(this).attr("value");
+						 postUrl += "&checkedid="+value;
+					 }
+	                                
+	            });
+				$(this).attr("href",postUrl); 
+			});
+		   
+		   jQuery('#offline').click(function (){
+			   var postUrl = $(this).attr("href");
+			   var set = jQuery('#table1 .checkboxes');
+				 jQuery(set).each(function () {
+					 var isChecked = $(this).attr("checked");
+					 if(isChecked == "checked"){
+						 var value = $(this).attr("value");
+						 postUrl += "&checkedid="+value;
+					 }
+	                                
+	            });
+				$(this).attr("href",postUrl); 
+			});
 		});
 		
 		jQuery('#content').addClass('active');
 		jQuery('#content a').append('<span class="selected"></span>');
+		
+		
 	
+		
 </script>
 	
 

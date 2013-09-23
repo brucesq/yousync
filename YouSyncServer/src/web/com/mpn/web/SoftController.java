@@ -4,7 +4,6 @@
 package com.mpn.web;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -167,6 +166,27 @@ public class SoftController {
 		}
 		return "redirect:/soft";
 	}
+	
+	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
+	@RequestMapping(value = "publish")
+	public String publish(@RequestParam(value = "checkedid", defaultValue = "") List<Long> checkedIdList
+			){
+		for (Long softId : checkedIdList) {
+			bussinessService.publishSoft(softId);
+		}
+		return "redirect:/soft";
+	}
+	
+	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
+	@RequestMapping(value = "offline")
+	public String offline(@RequestParam(value = "checkedid", defaultValue = "") List<Long> checkedIdList
+			){
+		for (Long softId : checkedIdList) {
+			bussinessService.offlineSoft(softId);
+		}
+		return "redirect:/soft";
+	}
+	
 
 	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
 	@RequestMapping(value = "create", method = RequestMethod.GET)

@@ -51,6 +51,17 @@ public class BussinessService {
 		updateVersion();
 	}
 	
+	public void publishSoft(Long id){
+		SoftwareItem item = getSoftwareItem(id);
+		item.setStatus("enabled");
+		softItemDao.save(item);
+	}
+	public void offlineSoft(Long id){
+		SoftwareItem item = getSoftwareItem(id);
+		item.setStatus("disabled");
+		softItemDao.save(item);
+	}
+	
 	public Page<SoftwareItem> getSoftItem( Map<String, Object> searchParams, int pageNumber, int pageSize,
 			String sortType) {
 		PageRequest pageRequest = buildPageRequest(pageNumber, pageSize, sortType);
