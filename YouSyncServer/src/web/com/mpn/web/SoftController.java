@@ -85,7 +85,6 @@ public class SoftController {
 				pageNumber, pageSize, sortType);
 		for(SoftwareItem item :softs){
 			bussinessService.getSoftwareItemChannel(item);
-			System.out.println(item.getChannelNames());
 		}
 
 		model.addAttribute("softs", softs);

@@ -11,6 +11,9 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -20,6 +23,7 @@ import com.google.common.collect.Maps;
  */
 @Entity
 @Table(name="soft_item")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class SoftwareItem extends IdEntity {
 	
 	

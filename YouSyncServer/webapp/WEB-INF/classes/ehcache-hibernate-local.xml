@@ -6,6 +6,16 @@
 	<!-- DefaultCache setting. -->
 	<defaultCache maxElementsInMemory="10000" eternal="false" timeToIdleSeconds="300" timeToLiveSeconds="600"
 		overflowToDisk="true"  />
+	
+	<cache name="org.hibernate.cache.spi.UpdateTimestampsCache"  
+           maxElementsInMemory="5000"   
+           eternal="true"   
+           overflowToDisk="true" />  
+    <cache name="org.hibernate.cache.internal.StandardQueryCache"  
+           maxElementsInMemory="10000"   
+           eternal="false"   
+           timeToLiveSeconds="120"  
+           overflowToDisk="true" />    
 
 	<!-- Special objects setting. -->
 	<cache name="com.mpn.sd.User" maxElementsInMemory="1000" eternal="true"
@@ -15,5 +25,9 @@
 	<cache name="com.mpn.sd.entity.Team" maxElementsInMemory="100" eternal="true"
 		overflowToDisk="true"  />
 	<cache name="com.mpn.sd.Role" maxElementsInMemory="100"
+		eternal="true" overflowToDisk="true"  />
+	<cache name="com.mpn.sd.Channel" maxElementsInMemory="100"
+		eternal="true" overflowToDisk="true"  />
+	<cache name="com.mpn.sd.SoftwareItem" maxElementsInMemory="100"
 		eternal="true" overflowToDisk="true"  />
 </ehcache>

@@ -66,7 +66,6 @@ public class BussinessService {
 			String sortType) {
 		PageRequest pageRequest = buildPageRequest(pageNumber, pageSize, sortType);
 		Specification<SoftwareItem> spec = buildSpecification(searchParams);
-
 		return softItemDao.findAll(spec, pageRequest);
 	}
 	
