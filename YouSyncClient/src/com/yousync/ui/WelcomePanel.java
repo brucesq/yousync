@@ -1,10 +1,14 @@
 package com.yousync.ui;
 
-import javax.swing.JPanel;
-import javax.swing.JLabel;
-import javax.swing.JButton;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+
+import com.yousync.core.Application;
+import com.yousync.core.BussinessService;
 
 public class WelcomePanel extends JPanel {
 
@@ -23,10 +27,20 @@ public class WelcomePanel extends JPanel {
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				mApplicationWindow.showLoginPanel();
+				BussinessService.logout();
 			}
 		});
 		button.setBounds(326, 6, 117, 29);
 		add(button);
+		
+		JButton btnInstallAll = new JButton("Ò»¼ü°²×°");
+		btnInstallAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				Application.installAll();
+			}
+		});
+		btnInstallAll.setBounds(500, 6, 117, 29);
+		add(btnInstallAll);
 
 	}
 	

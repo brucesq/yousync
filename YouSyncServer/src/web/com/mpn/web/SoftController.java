@@ -65,10 +65,9 @@ public class SoftController {
 
 	@Autowired
 	private GloableService gloableService;
-	
+
 	@Autowired
 	private AccountService accountService;
-
 
 	// 特别设定多个ReuireRoles之间为Or关系，而不是默认的And.
 	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
@@ -83,7 +82,7 @@ public class SoftController {
 				request, "search_");
 		Page<SoftwareItem> softs = bussinessService.getSoftItem(searchParams,
 				pageNumber, pageSize, sortType);
-		for(SoftwareItem item :softs){
+		for (SoftwareItem item : softs) {
 			bussinessService.getSoftwareItemChannel(item);
 		}
 
@@ -102,11 +101,12 @@ public class SoftController {
 	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
 	@RequestMapping(value = "update/{id}", method = RequestMethod.GET)
 	public String updateForm(@PathVariable("id") Long id, Model model) {
-		
-		model.addAttribute("soft", bussinessService.getSoftwareItemChannel(bussinessService.getSoftwareItem(id)));
+
+		model.addAttribute("soft", bussinessService
+				.getSoftwareItemChannel(bussinessService.getSoftwareItem(id)));
 		model.addAttribute("allStatus", SoftwareItem.getAllStatus());
 		model.addAttribute("allChannels", accountService.getAllChannel());
-		
+
 		return "soft/softForm";
 	}
 
@@ -114,14 +114,38 @@ public class SoftController {
 	@RequestMapping(value = "update", method = RequestMethod.POST)
 	public String update(@Valid @ModelAttribute("soft") SoftwareItem item,
 			@RequestParam(value = "channelList") List<Long> checkedChannelList,
+			@RequestParam(value = "apkFile") MultipartFile apkFile,
 			RedirectAttributes redirectAttributes) {
 		String channelIds = "@";
-		for(Long cid : checkedChannelList){
-			channelIds += cid.toString() +"@";
+		for (Long cid : checkedChannelList) {
+			channelIds += cid.toString() + "@";
 		}
 		item.setChannels(channelIds);
+
+		if (!apkFile.isEmpty())  {
+			try {
+				String realPath = gloableService.getUploadPath();
+				File newFile = new File(realPath, apkFile.getOriginalFilename());
+				FileUtils.copyInputStreamToFile(apkFile.getInputStream(),
+						newFile);
+				ApkInfo apkInfo = apkUtil.getApkInfo(newFile.getAbsolutePath());
+				item.setApkFile(apkFile.getOriginalFilename());
+				item.setIconUrl("icon/" + apkInfo.getPackageName() + ".png");
+				item.setPackageName(apkInfo.getPackageName());
+				IconUtil.extractFileFromApk(newFile.getAbsolutePath(), IconUtil
+						.getLargeIcon(apkInfo.getApplicationIcons(),
+								apkInfo.getApplicationIcon()), realPath
+						+ "icon/" + apkInfo.getPackageName() + ".png");
+			} catch (Exception e) {
+				e.printStackTrace();
+				redirectAttributes.addFlashAttribute("message", "保存应用包失败");
+				return "redirect:/soft/update/"+item.getId();
+			}
+		}
+
 		bussinessService.saveSoftItem(item);
 		redirectAttributes.addFlashAttribute("message", "保存应用包成功");
+
 		return "redirect:/soft";
 	}
 
@@ -155,8 +179,8 @@ public class SoftController {
 							apkInfo.getApplicationIcon()), realPath + "icon/"
 					+ apkInfo.getPackageName() + ".png");
 			String channelIds = "@";
-			for(Long cid : checkedChannelList){
-				channelIds += cid.toString() +"@";
+			for (Long cid : checkedChannelList) {
+				channelIds += cid.toString() + "@";
 			}
 			item.setChannels(channelIds);
 			bussinessService.saveSoftItem(item);
@@ -165,27 +189,26 @@ public class SoftController {
 		}
 		return "redirect:/soft";
 	}
-	
+
 	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
 	@RequestMapping(value = "publish")
-	public String publish(@RequestParam(value = "checkedid", defaultValue = "") List<Long> checkedIdList
-			){
+	public String publish(
+			@RequestParam(value = "checkedid", defaultValue = "") List<Long> checkedIdList) {
 		for (Long softId : checkedIdList) {
 			bussinessService.publishSoft(softId);
 		}
 		return "redirect:/soft";
 	}
-	
+
 	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
 	@RequestMapping(value = "offline")
-	public String offline(@RequestParam(value = "checkedid", defaultValue = "") List<Long> checkedIdList
-			){
+	public String offline(
+			@RequestParam(value = "checkedid", defaultValue = "") List<Long> checkedIdList) {
 		for (Long softId : checkedIdList) {
 			bussinessService.offlineSoft(softId);
 		}
 		return "redirect:/soft";
 	}
-	
 
 	@RequiresRoles(value = { "Admin", "User" }, logical = Logical.OR)
 	@RequestMapping(value = "create", method = RequestMethod.GET)
@@ -195,17 +218,18 @@ public class SoftController {
 		return "soft/softUpload";
 	}
 
-	
 	@ModelAttribute
-	public void getSoft(@RequestParam(value = "id", defaultValue = "-1") Long id, Model model) {
+	public void getSoft(
+			@RequestParam(value = "id", defaultValue = "-1") Long id,
+			Model model) {
 		if (id != -1) {
 			model.addAttribute("soft", bussinessService.getSoftwareItem(id));
 		}
 	}
-	
+
 	@InitBinder
 	protected void initBinder(WebDataBinder binder) {
-		binder.setDisallowedFields("channelList");
+		binder.setDisallowedFields("channelList","apkFile");
 
 	}
 }

@@ -30,6 +30,11 @@ public class BussinessService {
 //	private final static String serverName = "http://localhost:8080/yousync/api/";
 
 	private static User currentUser;
+	
+	public static void logout(){
+		currentUser = null;
+		Application.unLoadDataModel();
+	}
 
 	public static boolean login(String userName, String passWord) {
 		DefaultHttpClient httpclient = new DefaultHttpClient();
@@ -60,6 +65,7 @@ public class BussinessService {
 				currentUser.name = name;
 				System.out.println(userId+":"+name);
 				Application.updateChannel(channel);
+				
 			}
 			
 			
