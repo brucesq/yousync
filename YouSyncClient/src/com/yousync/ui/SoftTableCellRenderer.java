@@ -112,7 +112,7 @@ public class SoftTableCellRenderer implements TableCellRenderer,
 	}
 
 	private void installApkAction(SoftwareObject softwareObject) {
-		Application.installAPK(softwareObject,null);
+		Application.installAPK(softwareObject);
 	}
 
 	private ImageIcon getImageIcon(SoftwareObject softwareObject) {

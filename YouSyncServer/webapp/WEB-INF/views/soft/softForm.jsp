@@ -154,15 +154,6 @@
 									</div>
 									
 
-									<div class="control-group">
-
-										<label class="control-label">新版本</label>
-
-										<div class="controls">
-											<input id="apkFile" name="apkFile"  type="file"  class="span6 m-wrap"/>
-										</div>
-										
-									</div>
 									
 
 									<div class="form-actions">
