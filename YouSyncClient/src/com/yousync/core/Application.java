@@ -37,10 +37,14 @@ public class Application {
 	private static String applicationPath;
 	public final static String softWareUrl = "http://yousync.ignag.com/yousync/api/softdb";
 	public final static String versionUrl = "http://yousync.ignag.com/yousync/api/version";
-//	public final static String softWareUrl = "http://localhost:8080/yousync/api/softdb";
-//	public final static String versionUrl = "http://localhost:8080/yousync/api/version";
-//	public final static String softWareUrl = "http://img1.kyimg.com/imgp/ys.db";
-//	public final static String versionUrl = "http://img1.kyimg.com/imgp/version.txt";
+	// public final static String softWareUrl =
+	// "http://localhost:8080/yousync/api/softdb";
+	// public final static String versionUrl =
+	// "http://localhost:8080/yousync/api/version";
+	// public final static String softWareUrl =
+	// "http://img1.kyimg.com/imgp/ys.db";
+	// public final static String versionUrl =
+	// "http://img1.kyimg.com/imgp/version.txt";
 
 	private static List<SoftwareObject> models = new ArrayList<SoftwareObject>();
 	private static String cacheFileDir = "";
@@ -63,6 +67,16 @@ public class Application {
 		loadProperties();
 	}
 
+	public static void loadDataModel() {
+		startSoftUpdateThread(applicationPath + File.separator + "configs"
+				+ File.separator + "ys.db", applicationPath + File.separator
+				+ "configs" + File.separator + "version.txt");
+	}
+
+	public static void unLoadDataModel() {
+		applicationWindow.setSoftModels(new ArrayList());
+	}
+
 	private static void loadProperties() {
 		macAddr = getMac();
 		applicationPath = System.getProperty("user.dir");
@@ -73,9 +87,7 @@ public class Application {
 				+ File.separator + "adb");
 		cacheFileDir = applicationPath + File.separator + "cache";
 		checkCacheFileDirExist();
-		startSoftUpdateThread(applicationPath + File.separator + "configs"
-				+ File.separator + "ys.db", applicationPath + File.separator
-				+ "configs" + File.separator + "version.txt");
+
 		startDeviceCheckThread();
 	}
 
@@ -84,29 +96,32 @@ public class Application {
 		// return s.substring(s.length() - 2);
 		return String.format("%02x", b); // 网友的建议,可修改为这个代码，更简单通用一些
 	}
-	public static void updateChannel(String pChannel){
+
+	public static void updateChannel(String pChannel) {
 		channel = pChannel;
 		File channelFile = new File(applicationPath + File.separator + "c.txt");
 		try {
-			FileUtils.writeStringToFile(channelFile, pChannel,  "utf-8");
+			FileUtils.writeStringToFile(channelFile, pChannel, "utf-8");
 			startSoftUpdateThread(applicationPath + File.separator + "configs"
-					+ File.separator + "ys.db", applicationPath + File.separator
-					+ "configs" + File.separator + "version.txt");
+					+ File.separator + "ys.db", applicationPath
+					+ File.separator + "configs" + File.separator
+					+ "version.txt");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
-	public static void initChannel(){
+
+	public static void initChannel() {
 		File channelFile = new File(applicationPath + File.separator + "c.txt");
-		if(channelFile.exists()){
+		if (channelFile.exists()) {
 			try {
-				channel = FileUtils.readFileToString(channelFile,  "utf-8");
+				channel = FileUtils.readFileToString(channelFile, "utf-8");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-		
+
 	}
 
 	public static String getMac() {
@@ -198,7 +213,8 @@ public class Application {
 		return builder.toString();
 	}
 
-	public static void installAPK(final SoftwareObject softwareObject) {
+	public static void installAPK(final SoftwareObject softwareObject,
+			final InstallCallBack callBack) {
 
 		String apkFilepath = "";
 		if (StringUtils.isNotEmpty(softwareObject.getCacheSoftFile())) {
@@ -217,10 +233,11 @@ public class Application {
 		} else {
 			JOptionPane.showMessageDialog(null, "安装包正在下载中，请稍后尝试", "消息",
 					JOptionPane.WARNING_MESSAGE);
+			callBack.finishInstall();
 			return;
 		}
 
-		final ProcessBarDialog dialog = new ProcessBarDialog("安装中");
+		final ProcessBarDialog dialog = new ProcessBarDialog(softwareObject.getSoftName()+" 安装中");
 		dialog.setVisible(true);
 
 		applicationWindow.setRightStatus("安装中", true);
@@ -237,7 +254,7 @@ public class Application {
 
 							String status = "";
 							if (installStatus) {
-								status = "安装成功！";
+								status = softwareObject.getSoftName()+" 安装成功！";
 								System.out.println(Application.deviceNum + ":"
 										+ Application.deviceBrand + ":"
 										+ softwareObject.getSoftId() + ":"
@@ -250,12 +267,13 @@ public class Application {
 										softwareObject.getSoftName(),
 										Application.macAddr);
 							} else
-								status = "安装失败！";
+								status = softwareObject.getSoftName()+ "安装失败！";
 							applicationWindow.setRightStatus(status, false);
 							dialog.finishDialog(status);
 							laterCloseDialog(dialog, 2000, true);
-
+							callBack.finishInstall();
 						}
+
 					});
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -264,6 +282,23 @@ public class Application {
 		});
 		installThread.start();
 
+	}
+
+	public static void installAll() {
+		// TODO:
+		int softNum = models.size();
+		if(softNum > 0){
+			installAPK(models.get(0),new InstallCallBack(){
+				int index = 0;
+				@Override
+				public void finishInstall() {
+					index++;
+					if(index < models.size()){
+						installAPK(models.get(index),this);
+					}
+					
+				}});
+		}
 	}
 
 	private static void laterCloseDialog(final JDialog dialog,

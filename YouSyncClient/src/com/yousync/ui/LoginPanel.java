@@ -54,12 +54,14 @@ public class LoginPanel extends JPanel {
 		btnNewButton.setBounds(415, 4, 117, 29);
 		add(btnNewButton);
 
+		
+		
 	}
 
 	public void login() {
 		String password = passwordTextField.getText();
 		String name = userTextField.getText();
-		System.out.println(password + ":" + name);
+//		System.out.println(password + ":" + name);
 		if (BussinessService.login(name, password)) {
 			mApplicationWindow.showWelcomePanel(name);
 		} else {
